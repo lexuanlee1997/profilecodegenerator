@@ -1,1 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FFA Speaker Profile Generator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --dark: #1a1e35;
+      --bg: #f5f3ef;
+      --white: #ffffff;
+      --border: #e2ddd6;
+      --text: #3a3a3a;
+      --muted: #888;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--dark);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header .logo-circle {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold);
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    header h1 span { color: var(--gold); }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--dark);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: #faf9f7;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--gold);
+      background: var(--white);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.6;
+    }
+
+    .has-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .toggle {
+      position: relative;
+      width: 44px; height: 24px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #d1d5db;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle input:checked + .slider { background: var(--gold); }
+    .toggle input:checked + .slider::before { transform: translateX(20px); }
+
+    .toggle-label {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .btn-generate {
+      width: 100%;
+      padding: 14px;
+      background: var(--dark);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+
+    .btn-generate:hover { background: #2a3055; }
+    .btn-generate:active { transform: scale(0.98); }
+
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .output-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--dark);
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .btn-copy {
+      padding: 8px 18px;
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-copy:hover { opacity: 0.85; }
+    .btn-copy:active { transform: scale(0.97); }
+    .btn-copy.copied { background: #22c55e; color: white; }
+
+    #output {
+      background: #1a1e35;
+      color: #e2ddd6;
+      border-radius: 10px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 200px;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    #output.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .tip {
+      margin-top: 14px;
+      padding: 12px 16px;
+      background: #fffbeb;
+      border-left: 3px solid var(--gold);
+      border-radius: 6px;
+      font-size: 12.5px;
+      color: #7a6020;
+      line-height: 1.6;
+    }
+
+    .required::after {
+      content: ' *';
+      color: #e05c5c;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-circle">FFA</div>
+  <h1>Future Fit Asia <span>Profile Generator</span></h1>
+</header>
+
+<div class="container">
+
+  <!-- FORM -->
+  <div class="card">
+    <h2>Speaker Details</h2>
+
+    <div class="field">
+      <label class="required">Image ID</label>
+      <input type="text" id="imageId" placeholder="e.g. 14732" />
+    </div>
+
+    <div class="field">
+      <label class="required">Full Name</label>
+      <input type="text" id="name" placeholder="e.g. Dr. Ismahane Elouafi" />
+    </div>
+
+    <div class="field">
+      <label class="required">Position / Title</label>
+      <input type="text" id="position" placeholder="e.g. Executive Managing Director" />
+    </div>
+
+    <div class="field">
+      <label class="required">Company / Organisation</label>
+      <input type="text" id="company" placeholder="e.g. CGIAR" />
+    </div>
+
+    <div class="field">
+      <label class="required">Bio</label>
+      <textarea id="bio" placeholder="Enter the speaker's biography here..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>LinkedIn URL <span style="color:var(--muted); font-size:11px; text-transform:none; letter-spacing:0;">(optional)</span></label>
+      <input type="text" id="linkedin" placeholder="https://www.linkedin.com/in/username/" />
+    </div>
+
+    <div class="has-logo">
+      <label class="toggle">
+        <input type="checkbox" id="hasLogo" onchange="toggleLogoField()" />
+        <span class="slider"></span>
+      </label>
+      <span class="toggle-label">Include corporate logo</span>
+    </div>
+
+    <div class="field" id="logoField" style="display:none;">
+      <label>Logo URL</label>
+      <input type="text" id="logoUrl" placeholder="https://futurefitasia.com/wp-content/uploads/..." />
+      <input type="text" id="logoAlt" placeholder="Logo alt text (e.g. CGIAR Logo)" style="margin-top:8px;" />
+    </div>
+
+    <button class="btn-generate" onclick="generate()">Generate Code</button>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="card">
+    <div class="output-header">
+      <h2>Generated Code</h2>
+      <button class="btn-copy" id="copyBtn" onclick="copyCode()">Copy</button>
+    </div>
+    <div id="output" class="empty">Fill in the form and click Generate →</div>
+    <div class="tip">
+      💡 Paste this code directly into the <strong>Divi Text Module</strong> in your WordPress editor (use the HTML/Text tab, not Visual).
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleLogoField() {
+    const hasLogo = document.getElementById('hasLogo').checked;
+    document.getElementById('logoField').style.display = hasLogo ? 'block' : 'none';
+  }
+
+  function generate() {
+    const imageId  = document.getElementById('imageId').value.trim();
+    const name     = document.getElementById('name').value.trim();
+    const position = document.getElementById('position').value.trim();
+    const company  = document.getElementById('company').value.trim();
+    const bio      = document.getElementById('bio').value.trim();
+    const linkedin = document.getElementById('linkedin').value.trim();
+    const hasLogo  = document.getElementById('hasLogo').checked;
+    const logoUrl  = document.getElementById('logoUrl').value.trim();
+    const logoAlt  = document.getElementById('logoAlt').value.trim() || `${company} Logo`;
+
+    if (!imageId || !name || !position || !company || !bio) {
+      const out = document.getElementById('output');
+      out.classList.add('empty');
+      out.textContent = '⚠️ Please fill in all required fields.';
+      return;
+    }
+
+    const logoBlock = hasLogo && logoUrl
+      ? `<div class="logo-overlay">\n  <img src="${logoUrl}" alt="${logoAlt}">\n</div>\n`
+      : '';
+
+    const linkedinBlock = linkedin
+      ? `<div class="et_pb_member_social_links"><a href="${linkedin}" class="et_pb_font_icon et_pb_linkedin_icon"></a></div>`
+      : `<div class="et_pb_member_social_links"></div>`;
+
+    const code =
+`<p>[cl-ib image="${imageId}" title="${name}" desc="</p>
+<p>${bio}</p>
+<p>&nbsp;</p>
+<p>" animation="hebe"]</p>
+${logoBlock}<h4 class="et_pb_module_header" style="text-align: center;">${name}</h4>
+<div>
+<p class="_04xlpA direction-ltr align-center para-style-body" style="text-align: center;"><span class="JsGRdQ">${position}<br /></span><strong><span class="JsGRdQ">${company}</span></strong></p>
+<p>&nbsp;</p>
+</div>
+${linkedinBlock}`;
+
+    const out = document.getElementById('output');
+    out.classList.remove('empty');
+    out.textContent = code;
+  }
+
+  function copyCode() {
+    const out = document.getElementById('output');
+    if (out.classList.contains('empty')) return;
+    navigator.clipboard.writeText(out.textContent).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
